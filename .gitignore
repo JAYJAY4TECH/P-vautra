@@ -85,3 +85,5 @@ temp/
 *.db
 backups/
 dump/
+.vercel
+.env*

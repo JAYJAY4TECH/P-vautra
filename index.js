@@ -125,6 +125,7 @@ app.use(attachUser);
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/plans', require('./routes/plans'));
+app.use('/api/vaults', require('./routes/vaults'));
 app.use('/api/referrals', require('./routes/referrals'));
 app.use('/api/deposit', require('./routes/deposit'));
 app.use('/api/admin', require('./routes/admin'));

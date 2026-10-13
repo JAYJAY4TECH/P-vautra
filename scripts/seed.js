@@ -20,22 +20,58 @@ const Plan = require('../models/Plan');
     console.log('[seed] Admin already exists');
   }
 
-  const plans = [
-    { name: 'Starter', slug: 'starter', description: 'Low-minimum entry tier.',
-      minAmount: 50, maxAmount: 500, durationDays: 30, feePercent: 1,
-      riskLevel: 'low', terms: 'Demo only. No real funds accepted.', order: 1 },
-    { name: 'Growth',  slug: 'growth',  description: 'Balanced tier.',
-      minAmount: 500, maxAmount: 5000, durationDays: 60, feePercent: 1.5,
-      riskLevel: 'medium', terms: 'Demo only. No real funds accepted.', order: 2 },
-    { name: 'Prime',   slug: 'prime',   description: 'Higher-tier access.',
-      minAmount: 5000, maxAmount: 50000, durationDays: 90, feePercent: 2,
-      riskLevel: 'high', terms: 'Demo only. No real funds accepted.', order: 3 }
+  const tiers = [
+    {
+      name: 'Starter Vault',
+      slug: 'starter',
+      tier: 1,
+      description: 'Low-minimum entry tier. Best for first-time savers.',
+      minAmount: 10,
+      maxAmount: 500,
+      durationDays: 30,
+      apyPercent: 5.5,
+      feePercent: 0.5,
+      riskLevel: 'low',
+      terms: 'Projected yield based on a simple-interest model. Not guaranteed. Rates subject to change.',
+      enabled: true,
+      order: 1
+    },
+    {
+      name: 'Growth Vault',
+      slug: 'growth',
+      tier: 2,
+      description: 'Balanced tier for steady savers.',
+      minAmount: 500,
+      maxAmount: 5000,
+      durationDays: 60,
+      apyPercent: 9.5,
+      feePercent: 1.0,
+      riskLevel: 'medium',
+      terms: 'Projected yield based on a simple-interest model. Not guaranteed. Rates subject to change.',
+      enabled: true,
+      order: 2
+    },
+    {
+      name: 'Prime Vault',
+      slug: 'prime',
+      tier: 3,
+      description: 'Highest tier for committed investors.',
+      minAmount: 5000,
+      maxAmount: 50000,
+      durationDays: 90,
+      apyPercent: 14.0,
+      feePercent: 1.5,
+      riskLevel: 'high',
+      terms: 'Projected yield based on a simple-interest model. Not guaranteed. Rates subject to change.',
+      enabled: true,
+      order: 3
+    }
   ];
 
-  for (const p of plans) {
-    await Plan.findOneAndUpdate({ slug: p.slug }, p, { upsert: true, new: true });
+  for (const t of tiers) {
+    await Plan.findOneAndUpdate({ slug: t.slug }, t, { upsert: true, new: true });
   }
-  console.log('[seed] Plans upserted:', plans.length);
+  console.log('[seed] Tiers upserted:', tiers.length);
 
   await mongoose.disconnect();
   process.exit(0);

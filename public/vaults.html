@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vaults — Vaultra</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { ink:'#0B0F14', panel:'#111823', line:'#1E2937', mint:'#3DDC97', mint2:'#22B27A', gold:'#E8C46A' },
+        fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','sans-serif'] },
+        boxShadow: { glow: '0 0 40px -10px rgba(61,220,151,0.45)' }
+      } }
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="bg-ink text-slate-200 min-h-screen">
+
+<div class="flex min-h-screen">
+  <aside class="hidden lg:flex w-64 flex-col border-r border-white/5 bg-panel/40 p-5">
+    <a href="/index.html" class="flex items-center gap-2 mb-10">
+      <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-mint to-mint2 grid place-items-center shadow-glow">
+        <i class="fa-solid fa-vault text-[#062015] text-sm"></i>
+      </span>
+      <span class="text-white font-semibold tracking-tight text-lg">Vaultra</span>
+    </a>
+    <nav class="flex-1 space-y-1">
+      <a href="/dashboard.html" class="sidebar-link"><i class="fa-solid fa-house w-4"></i> Overview</a>
+      <a href="/vaults.html" class="sidebar-link active"><i class="fa-solid fa-layer-group w-4"></i> Vaults</a>
+      <a href="/deposit.html" class="sidebar-link"><i class="fa-solid fa-arrow-down w-4"></i> Deposit</a>
+      <a href="/referrals.html" class="sidebar-link"><i class="fa-solid fa-user-group w-4"></i> Referrals</a>
+      <a href="/notifications.html" class="sidebar-link"><i class="fa-solid fa-bell w-4"></i> Notifications</a>
+      <a href="/profile.html" class="sidebar-link"><i class="fa-solid fa-user w-4"></i> Profile</a>
+      <a href="/settings.html" class="sidebar-link"><i class="fa-solid fa-gear w-4"></i> Settings</a>
+      <a href="/support.html" class="sidebar-link"><i class="fa-solid fa-life-ring w-4"></i> Support</a>
+    </nav>
+    <div class="mt-6 pt-6 border-t border-white/5">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-full bg-mint/15 grid place-items-center text-mint font-semibold" data-user-initial>U</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm text-white truncate" data-user-name>—</div>
+          <div class="text-xs text-slate-500 truncate" data-user-email>—</div>
+        </div>
+      </div>
+      <button data-logout class="sidebar-link w-full text-left text-rose-300 hover:text-rose-200">
+        <i class="fa-solid fa-arrow-right-from-bracket w-4"></i> Log out
+      </button>
+    </div>
+  </aside>
+
+  <div class="flex-1 flex flex-col">
+    <header class="border-b border-white/5 bg-ink/60 backdrop-blur sticky top-0 z-30">
+      <div class="px-5 sm:px-8 h-16 flex items-center justify-between">
+        <h1 class="text-white font-semibold">Investment Vaults</h1>
+        <a href="/dashboard.html" class="text-xs text-slate-400 hover:text-white">
+          <i class="fa-solid fa-arrow-left mr-2"></i> Back
+        </a>
+      </div>
+    </header>
+
+    <main class="flex-1 px-5 sm:px-8 py-8 max-w-6xl mx-auto w-full fade-in">
+
+      <!-- Active vaults summary -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div class="card">
+          <div class="text-xs uppercase tracking-wider text-slate-500">Total invested</div>
+          <div class="text-2xl font-semibold text-white mt-2" id="totalPrincipal">$0.00</div>
+        </div>
+        <div class="card">
+          <div class="text-xs uppercase tracking-wider text-slate-500">Total earned</div>
+          <div class="text-2xl font-semibold text-mint mt-2" id="totalAccrued">$0.00</div>
+        </div>
+        <div class="card">
+          <div class="text-xs uppercase tracking-wider text-slate-500">Active vaults</div>
+          <div class="text-2xl font-semibold text-white mt-2" id="activeCount">0</div>
+        </div>
+      </div>
+
+      <!-- Active vaults list -->
+      <h2 class="text-lg font-semibold text-white mb-4">Your vaults</h2>
+      <div id="vaultsList" class="space-y-4"></div>
+
+      <!-- Tiers -->
+      <h2 class="text-lg font-semibold text-white mt-12 mb-2">Available tiers</h2>
+      <p class="text-sm text-slate-500 mb-6">
+        Projected yields are estimates based on a simple-interest model. Not guaranteed. Past performance does not predict future results.
+      </p>
+      <div id="tiersList" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+    </main>
+  </div>
+</div>
+
+<!-- Open Vault modal -->
+<div id="openModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm grid place-items-center p-5">
+  <div class="card max-w-md w-full">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-white font-semibold text-lg">Open <span id="tierName">Vault</span></h3>
+      <button data-close-modal class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="openForm" class="space-y-4">
+      <div>
+        <label class="label">Choose coin</label>
+        <select name="coin" class="input" required>
+          <option value="">Select coin</option>
+          <option value="BTC">Bitcoin (BTC)</option>
+          <option value="ETH">Ethereum (ETH)</option>
+          <option value="SOL">Solana (SOL)</option>
+          <option value="USDT">USDT (TRC20)</option>
+        </select>
+      </div>
+      <div>
+        <label class="label">Amount (USD value)</label>
+        <input class="input" name="principalUsd" type="number" min="1" step="0.01" required placeholder="e.g. 100" />
+        <p class="text-xs text-slate-500 mt-1" id="tierBounds">Min $— — Max $—</p>
+      </div>
+      <div>
+        <label class="label">Deposit transaction hash <span class="text-slate-600">(optional)</span></label>
+        <input class="input" name="depositTxHash" type="text" placeholder="Paste the blockchain tx hash" />
+      </div>
+      <p class="text-xs text-slate-500">
+        After submitting, you'll see our crypto deposit addresses. Send the matching coin, then confirm here.
+        Vault starts accruing once the deposit is verified.
+      </p>
+      <button class="btn-primary w-full min-h-[48px]" type="submit">
+        <span data-label>Open Vault</span>
+        <span data-spin class="hidden"><span class="spinner"></span></span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/vaults.js"></script>
+</body>
+</html>
