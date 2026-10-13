@@ -9,8 +9,8 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const csrf = require('csrf');
 
-const connectDB = require('../config/database');
-const { attachUser } = require('../middleware/auth');
+const connectDB = require('./config/database');
+const { attachUser } = require('./middleware/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -44,7 +44,7 @@ app.use((req, res, next) => {
 });
 
 // ---------- Static files ----------
-app.use(express.static(path.join(__dirname, '..', 'public'), {
+app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: process.env.NODE_ENV === 'production' ? '1h' : 0,
   etag: process.env.NODE_ENV === 'production',
   lastModified: true
@@ -122,12 +122,12 @@ app.use('/api/auth/register', authLimiter);
 app.use(attachUser);
 
 // ---------- Routes ----------
-app.use('/api/auth', require('../routes/auth'));
-app.use('/api/dashboard', require('../routes/dashboard'));
-app.use('/api/plans', require('../routes/plans'));
-app.use('/api/referrals', require('../routes/referrals'));
-app.use('/api/deposit', require('../routes/deposit'));
-app.use('/api/admin', require('../routes/admin'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/dashboard', require('./routes/dashboard'));
+app.use('/api/plans', require('./routes/plans'));
+app.use('/api/referrals', require('./routes/referrals'));
+app.use('/api/deposit', require('./routes/deposit'));
+app.use('/api/admin', require('./routes/admin'));
 
 // ---------- 404 ----------
 app.use('/api', (req, res) => {
@@ -135,7 +135,7 @@ app.use('/api', (req, res) => {
 });
 
 app.use((req, res) => {
-  res.status(404).sendFile(path.join(__dirname, '..', 'public', '404.html'));
+  res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
 // ---------- Errors ----------
