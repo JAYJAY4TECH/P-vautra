@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin — Vaultra</title>
+  <title>Admin - Vaultra</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -24,60 +24,79 @@
 
 <header class="border-b border-white/5 bg-ink/60 backdrop-blur sticky top-0 z-30">
   <nav class="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-    <a href="/index.html" class="flex items-center gap-2 hover:scale-[1.02] transition-transform">
+    <a href="/index.html" class="flex items-center gap-2">
       <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-mint to-mint2 grid place-items-center shadow-glow">
         <i class="fa-solid fa-vault text-[#062015] text-sm"></i>
       </span>
       <span class="text-white font-semibold tracking-tight text-lg">Vaultra <span class="text-gold text-xs ml-1">ADMIN</span></span>
     </a>
     <div class="flex items-center gap-3">
-      <a href="/dashboard.html" class="text-sm text-slate-400 hover:text-white min-h-[44px] flex items-center">Dashboard</a>
-      <button data-logout class="btn-ghost !py-2 !px-4 text-sm min-h-[44px]">Logout</button>
+      <a href="/dashboard.html" class="text-sm text-slate-400 hover:text-white">Dashboard</a>
+      <button data-logout class="btn-ghost !py-2 !px-4 text-sm">Logout</button>
     </div>
   </nav>
 </header>
 
-<main id="adminRoot" class="max-w-7xl mx-auto px-5 sm:px-8 py-8 page-enter">
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 card-grid stagger">
-    <div class="card">
-      <div class="flex items-center justify-between">
-        <span class="text-xs uppercase tracking-wider text-slate-500">Users</span>
-        <i class="fa-solid fa-users text-mint"></i>
+<main id="adminRoot" class="max-w-7xl mx-auto px-5 sm:px-8 py-8">
+
+  <div id="lockScreen" class="hidden grid place-items-center min-h-[60vh]">
+    <div class="card max-w-md w-full">
+      <div class="text-center mb-6">
+        <div class="w-14 h-14 rounded-full bg-mint/15 grid place-items-center text-mint mx-auto mb-4">
+          <i class="fa-solid fa-lock text-xl"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-white">Admin access</h1>
+        <p class="text-slate-400 mt-2 text-sm">Enter the admin password to continue.</p>
       </div>
-      <div class="text-2xl font-semibold text-white mt-3" data-stat="users">—</div>
-    </div>
-    <div class="card">
-      <div class="flex items-center justify-between">
-        <span class="text-xs uppercase tracking-wider text-slate-500">Plans</span>
-        <i class="fa-solid fa-layer-group text-mint"></i>
-      </div>
-      <div class="text-2xl font-semibold text-white mt-3" data-stat="plans">—</div>
-    </div>
-    <div class="card">
-      <div class="flex items-center justify-between">
-        <span class="text-xs uppercase tracking-wider text-slate-500">Referrals</span>
-        <i class="fa-solid fa-user-group text-mint"></i>
-      </div>
-      <div class="text-2xl font-semibold text-white mt-3" data-stat="referrals">—</div>
+      <form id="unlockForm" class="space-y-4">
+        <div data-form-error class="alert alert-error hidden"></div>
+        <div>
+          <label class="label" for="adminPassword">Password</label>
+          <div class="relative">
+            <input class="input pr-11" type="password" id="adminPassword" name="password"
+                   placeholder="Enter password" required autocomplete="off" />
+            <button type="button" data-toggle-password="adminPassword"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary w-full min-h-[48px]">
+          <span data-label>Unlock</span>
+          <span data-spin class="hidden"><span class="spinner"></span></span>
+        </button>
+      </form>
     </div>
   </div>
 
-  <div class="card mb-8 reveal">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
-      <h2 class="text-white font-semibold">Users</h2>
-      <input id="userSearch" class="input sm:max-w-xs min-h-[48px]" placeholder="Search by name or email..." />
+  <div id="adminPanel" class="hidden">
+    <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+      <div class="card"><div class="text-xs uppercase tracking-wider text-slate-500">Users</div>
+        <div class="text-2xl font-semibold text-white mt-2" data-stat="users">-</div></div>
+      <div class="card"><div class="text-xs uppercase tracking-wider text-slate-500">Plans</div>
+        <div class="text-2xl font-semibold text-white mt-2" data-stat="plans">-</div></div>
+      <div class="card"><div class="text-xs uppercase tracking-wider text-slate-500">Referrals</div>
+        <div class="text-2xl font-semibold text-white mt-2" data-stat="referrals">-</div></div>
+      <div class="card"><div class="text-xs uppercase tracking-wider text-slate-500">Active vaults</div>
+        <div class="text-2xl font-semibold text-white mt-2" data-stat="vaults">-</div></div>
+      <div class="card border-mint/30"><div class="text-xs uppercase tracking-wider text-mint">Pending deposits</div>
+        <div class="text-2xl font-semibold text-mint mt-2" data-stat="pending">-</div></div>
     </div>
-    <div id="usersTable" class="table-wrapper"></div>
-  </div>
 
-  <div class="card mb-8 reveal">
-    <h2 class="text-white font-semibold mb-4">Plans</h2>
-    <div id="plansTable" class="table-wrapper"></div>
-  </div>
+    <div class="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
+      <button class="tab-btn btn-primary !py-2 !px-4 text-sm" data-tab="deposits">Pending deposits</button>
+      <button class="tab-btn btn-ghost !py-2 !px-4 text-sm" data-tab="users">Users</button>
+      <button class="tab-btn btn-ghost !py-2 !px-4 text-sm" data-tab="plans">Plans</button>
+      <button class="tab-btn btn-ghost !py-2 !px-4 text-sm" data-tab="activity">Activity</button>
+      <button id="lockBtn" class="btn-ghost !py-2 !px-4 text-sm !text-rose-300 !border-rose-500/30 ml-auto">
+        <i class="fa-solid fa-lock"></i> Lock
+      </button>
+    </div>
 
-  <div class="card reveal">
-    <h2 class="text-white font-semibold mb-4">Recent platform activity</h2>
-    <div id="adminActivity"></div>
+    <section data-panel="deposits" class="space-y-4"></section>
+    <section data-panel="users" class="hidden space-y-4"></section>
+    <section data-panel="plans" class="hidden space-y-4"></section>
+    <section data-panel="activity" class="hidden space-y-4"></section>
   </div>
 </main>
 
