@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — Vaultra</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { ink:'#0B0F14', panel:'#111823', line:'#1E2937', mint:'#3DDC97', mint2:'#22B27A', gold:'#E8C46A' },
+        fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','sans-serif'] },
+        boxShadow: { glow: '0 0 40px -10px rgba(61,220,151,0.45)' }
+      } }
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="bg-ink text-slate-200 min-h-screen flex flex-col">
+
+<header class="border-b border-white/5">
+  <nav class="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+    <a href="/index.html" class="flex items-center gap-2">
+      <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-mint to-mint2 grid place-items-center shadow-glow">
+        <i class="fa-solid fa-vault text-[#062015] text-sm"></i>
+      </span>
+      <span class="text-white font-semibold tracking-tight text-lg">Vaultra</span>
+    </a>
+    <a href="/register.html" class="text-sm text-slate-400 hover:text-white">Need an account? <span class="text-mint">Sign up</span></a>
+  </nav>
+</header>
+
+<main class="flex-1 grid place-items-center px-5 py-16 page-enter">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-white">Welcome back</h1>
+      <p class="text-slate-400 mt-2 text-sm">Sign in to access your dashboard.</p>
+    </div>
+
+    <form id="loginForm" class="card space-y-5" novalidate>
+      <div data-form-error class="alert alert-error hidden"></div>
+
+      <div>
+        <label class="label" for="email">Email address</label>
+        <input class="input" type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email" />
+      </div>
+
+      <div>
+        <label class="label" for="password">Password</label>
+        <div class="relative">
+          <input class="input pr-11" type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password" />
+          <button type="button" data-toggle-password="password" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <label class="flex items-center gap-2 text-sm text-slate-400 select-none cursor-pointer">
+        <input type="checkbox" id="remember" name="remember" class="accent-mint w-4 h-4" />
+        <span>Remember me for 14 days</span>
+      </label>
+
+      <button type="submit" class="btn-primary w-full min-h-[48px]">
+        <span data-label>Sign In</span>
+        <span data-spin class="hidden"><span class="spinner"></span></span>
+      </button>
+
+      <p class="text-center text-sm text-slate-500">
+        Don't have an account? <a href="/register.html" class="text-mint hover:underline">Create one</a>
+      </p>
+    </form>
+  </div>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/auth.js"></script>
+</body>
+</html>

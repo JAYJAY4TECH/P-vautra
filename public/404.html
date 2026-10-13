@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Not Found — Vaultra</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { ink:'#0B0F14', panel:'#111823', line:'#1E2937', mint:'#3DDC97', mint2:'#22B27A', gold:'#E8C46A' },
+        fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','sans-serif'] },
+        boxShadow: { glow: '0 0 40px -10px rgba(61,220,151,0.45)' }
+      } }
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="bg-ink text-slate-200 min-h-screen grid place-items-center px-5">
+  <div class="text-center max-w-md page-enter stagger">
+    <div class="text-7xl font-bold text-mint mb-4">404</div>
+    <h1 class="text-2xl font-semibold text-white">Page not found</h1>
+    <p class="text-slate-400 mt-3">The page you're looking for doesn't exist or has moved.</p>
+    <a href="/index.html" class="btn-primary mt-8 inline-flex min-h-[48px] py-3">
+      <i class="fa-solid fa-house"></i> Back home
+    </a>
+  </div>
+</body>
+</html>

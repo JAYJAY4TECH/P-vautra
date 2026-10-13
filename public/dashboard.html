@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Vaultra</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { ink:'#0B0F14', panel:'#111823', line:'#1E2937', mint:'#3DDC97', mint2:'#22B27A', gold:'#E8C46A' },
+        fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','sans-serif'] },
+        boxShadow: { glow: '0 0 40px -10px rgba(61,220,151,0.45)' }
+      } }
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="bg-ink text-slate-200 min-h-screen">
+
+<div class="flex min-h-screen">
+
+  <!-- SIDEBAR -->
+  <aside class="desktop-sidebar hidden lg:flex w-64 flex-col border-r border-white/5 bg-panel/40 p-5">
+    <a href="/index.html" class="flex items-center gap-2 mb-10 hover:scale-[1.02] transition-transform">
+      <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-mint to-mint2 grid place-items-center shadow-glow">
+        <i class="fa-solid fa-vault text-[#062015] text-sm"></i>
+      </span>
+      <span class="text-white font-semibold tracking-tight text-lg">Vaultra</span>
+    </a>
+
+    <nav class="flex-1 space-y-1 stagger">
+      <a href="/dashboard.html" class="sidebar-link active"><i class="fa-solid fa-house w-4"></i> Overview</a>
+      <a href="/plans.html" class="sidebar-link"><i class="fa-solid fa-layer-group w-4"></i> Vaults</a>
+      <a href="/deposit.html" class="sidebar-link"><i class="fa-solid fa-arrow-down w-4"></i> Deposit</a>
+      <a href="/referrals.html" class="sidebar-link"><i class="fa-solid fa-user-group w-4"></i> Referrals</a>
+      <a href="/notifications.html" class="sidebar-link"><i class="fa-solid fa-bell w-4"></i> Notifications</a>
+      <a href="/profile.html" class="sidebar-link"><i class="fa-solid fa-user w-4"></i> Profile</a>
+      <a href="/settings.html" class="sidebar-link"><i class="fa-solid fa-gear w-4"></i> Settings</a>
+      <a href="/support.html" class="sidebar-link"><i class="fa-solid fa-life-ring w-4"></i> Support</a>
+    </nav>
+
+    <div class="mt-6 pt-6 border-t border-white/5">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-full bg-mint/15 grid place-items-center text-mint font-semibold" data-user-initial>U</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm text-white truncate" data-user-name>—</div>
+          <div class="text-xs text-slate-500 truncate" data-user-email>—</div>
+        </div>
+      </div>
+      <button data-logout class="sidebar-link w-full text-left text-rose-300 hover:text-rose-200 min-h-[44px]">
+        <i class="fa-solid fa-arrow-right-from-bracket w-4"></i> Log out
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="flex-1 flex flex-col">
+
+    <!-- TOPBAR -->
+    <header class="border-b border-white/5 bg-ink/60 backdrop-blur sticky top-0 z-30">
+      <div class="px-5 sm:px-8 h-16 flex items-center justify-between">
+        <div class="lg:hidden flex items-center gap-3">
+          <a href="/index.html" class="flex items-center gap-2 hover:scale-[1.02] transition-transform">
+            <span class="w-7 h-7 rounded-lg bg-gradient-to-br from-mint to-mint2 grid place-items-center">
+              <i class="fa-solid fa-vault text-[#062015] text-xs"></i>
+            </span>
+            <span class="text-white font-semibold">Vaultra</span>
+          </a>
+        </div>
+        <div class="hidden lg:block">
+          <h1 class="text-white font-semibold">Overview</h1>
+          <p class="text-xs text-slate-500">Welcome back to your dashboard</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <a href="/notifications.html" class="w-9 h-9 grid place-items-center rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 transition-colors min-h-[44px] min-w-[44px]">
+            <i class="fa-solid fa-bell text-sm"></i>
+          </a>
+          <a href="/profile.html" class="w-9 h-9 rounded-full bg-mint/15 grid place-items-center text-mint font-semibold" data-user-initial>U</a>
+        </div>
+      </div>
+      <!-- MOBILE NAV -->
+      <nav class="mobile-nav lg:hidden px-5 pb-3 overflow-x-auto whitespace-nowrap border-t border-white/5 -ml-5 -mr-5 px-5 stagger">
+        <div class="flex gap-2 pt-3 pb-2">
+          <a href="/dashboard.html" class="text-xs px-3 py-2 rounded-lg bg-mint/10 text-mint border border-mint/20 whitespace-nowrap min-h-[44px] flex items-center">Overview</a>
+          <a href="/plans.html" class="text-xs px-3 py-2 rounded-lg bg-white/5 text-slate-300 whitespace-nowrap min-h-[44px] flex items-center">Vaults</a>
+          <a href="/deposit.html" class="text-xs px-3 py-2 rounded-lg bg-white/5 text-slate-300 whitespace-nowrap min-h-[44px] flex items-center">Deposit</a>
+          <a href="/referrals.html" class="text-xs px-3 py-2 rounded-lg bg-white/5 text-slate-300 whitespace-nowrap min-h-[44px] flex items-center">Referrals</a>
+          <a href="/notifications.html" class="text-xs px-3 py-2 rounded-lg bg-white/5 text-slate-300 whitespace-nowrap min-h-[44px] flex items-center">Alerts</a>
+          <a href="/profile.html" class="text-xs px-3 py-2 rounded-lg bg-white/5 text-slate-300 whitespace-nowrap min-h-[44px] flex items-center">Profile</a>
+          <a href="/settings.html" class="text-xs px-3 py-2 rounded-lg bg-white/5 text-slate-300 whitespace-nowrap min-h-[44px] flex items-center">Settings</a>
+          <button data-logout class="text-xs px-3 py-2 rounded-lg bg-rose-500/10 text-rose-300 whitespace-nowrap min-h-[44px] flex items-center">Logout</button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- CONTENT -->
+    <main id="overviewRoot" class="flex-1 px-5 sm:px-8 py-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 card-grid stagger">
+        <div class="card">
+          <div class="flex items-center justify-between">
+            <span class="text-xs uppercase tracking-wider text-slate-500">Balance</span>
+            <i class="fa-solid fa-wallet text-mint"></i>
+          </div>
+          <div class="text-2xl font-semibold text-white mt-3" data-stat="balance">$0.00</div>
+          <div class="text-xs text-slate-500 mt-1">Available balance</div>
+        </div>
+        <div class="card">
+          <div class="flex items-center justify-between">
+            <span class="text-xs uppercase tracking-wider text-slate-500">Referrals</span>
+            <i class="fa-solid fa-user-group text-mint"></i>
+          </div>
+          <div class="text-2xl font-semibold text-white mt-3" data-stat="referrals">0</div>
+          <div class="text-xs text-slate-500 mt-1">Total signups</div>
+        </div>
+        <div class="card">
+          <div class="flex items-center justify-between">
+            <span class="text-xs uppercase tracking-wider text-slate-500">Rewards</span>
+            <i class="fa-solid fa-gift text-mint"></i>
+          </div>
+          <div class="text-2xl font-semibold text-white mt-3" data-stat="rewards">$0.00</div>
+          <div class="text-xs text-slate-500 mt-1">Earned credit</div>
+        </div>
+        <div class="card">
+          <div class="flex items-center justify-between">
+            <span class="text-xs uppercase tracking-wider text-slate-500">Active vault</span>
+            <i class="fa-solid fa-layer-group text-mint"></i>
+          </div>
+          <div class="text-2xl font-semibold text-white mt-3" data-stat="plan">None</div>
+          <div class="text-xs text-slate-500 mt-1">Selected tier</div>
+        </div>
+      </div>
+
+      <!-- DEPOSIT / WITHDRAW ACTIONS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+        <a href="/deposit.html" class="btn-primary w-full min-h-[48px] py-3">
+          <i class="fa-solid fa-arrow-down"></i> Deposit crypto
+        </a>
+        <button id="openWithdraw" class="btn-ghost w-full min-h-[48px] py-3">
+          <i class="fa-solid fa-arrow-up"></i> Withdraw funds
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+        <div class="lg:col-span-2 card">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-white font-semibold">Recent activity</h2>
+            <span class="text-xs text-slate-500">Last 10 events</span>
+          </div>
+          <div id="activityList"></div>
+        </div>
+
+        <div class="card">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-white font-semibold">Notifications</h2>
+            <a href="/notifications.html" class="text-xs text-mint hover:underline">View all</a>
+          </div>
+          <div id="notifPreview"></div>
+        </div>
+      </div>
+
+      <div class="card mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h3 class="text-white font-semibold">Refer and earn</h3>
+          <p class="text-sm text-slate-400 mt-1">Share your unique link and earn commission on every investment your referrals make.</p>
+        </div>
+        <a href="/referrals.html" class="btn-primary !py-2 !px-4 text-sm min-h-[44px] w-full sm:w-auto">
+          <i class="fa-solid fa-share-nodes"></i> Open referrals
+        </a>
+      </div>
+    </main>
+
+    <footer class="border-t border-white/5 px-5 sm:px-8 py-6 text-center text-xs text-slate-500">
+      © <span id="year"></span> Vaultra. All rights reserved. Vaultra is not a bank. Nothing on this site is financial advice.
+    </footer>
+  </div>
+</div>
+
+<!-- WITHDRAW MODAL -->
+<div id="withdrawModal" class="hidden fixed inset-0 z-50 modal-backdrop grid place-items-center p-5">
+  <div class="card max-w-md w-full modal-content">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-white font-semibold text-lg">Withdraw funds</h3>
+      <button data-close-modal class="text-slate-400 hover:text-white p-2 min-h-[44px] min-w-[44px]"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="withdrawForm" class="space-y-4">
+      <div>
+        <label class="label">Amount (USD)</label>
+        <input class="input" name="amount" type="number" min="1" step="0.01" placeholder="e.g. 100" required />
+      </div>
+      <p class="text-xs text-slate-500">Withdrawals are processed within 1–2 business days.</p>
+      <button class="btn-primary w-full min-h-[48px] py-3" type="submit">
+        <span data-label>Request withdrawal</span>
+        <span data-spin class="hidden"><span class="spinner"></span></span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<script src="/js/api.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/dashboard.js"></script>
+</body>
+</html>
