@@ -174,6 +174,114 @@ function applyRememberMe(req, remember) {
 }
 
 // ---------- Logout ----------
+// ---------- Forgot password ----------
+router.post(
+  '/forgot-password',
+  csrfCheck,
+  [body('email').isEmail().withMessage('Valid email required.').normalizeEmail()],
+  async (req, res) => {
+    const errors = validationResult(req).array();
+    if (errors.length) return res.status(400).json({ error: errors[0].msg });
+
+    const email = req.body.email;
+    try {
+      const user = await User.findOne({ email });
+
+      // Always respond OK even if user doesn't exist (avoids email enumeration)
+      if (!user) {
+        return res.json({ ok: true, message: 'If that email exists, a code has been sent.' });
+      }
+
+      // Generate 6-digit code
+      const code = String(Math.floor(100000 + Math.random() * 900000));
+
+      user.resetCode = code;
+      user.resetCodeExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 min
+      user.resetAttempts = 0;
+      await user.save();
+
+      const subject = 'Vaultra password reset code';
+      const textBody =
+        'Your Vaultra password reset code is: ' + code + '\n\n' +
+        'This code expires in 15 minutes. If you did not request this, ignore this email.';
+      const htmlBody =
+        '<p>Your Vaultra password reset code is:</p>' +
+        '<h2 style="letter-spacing:4px;">' + code + '</h2>' +
+        '<p>This code expires in 15 minutes. If you did not request this, ignore this email.</p>';
+
+      const { sendMail } = require('../config/mailer');
+      const result = await sendMail(user.email, subject, textBody, htmlBody);
+
+      if (!result.ok) {
+        return res.status(500).json({ error: 'Could not send email. Try again later.' });
+      }
+
+      res.json({ ok: true, message: 'Code sent. Check your email.' });
+    } catch (err) {
+      console.error('[auth/forgot-password]', err);
+      res.status(500).json({ error: 'Server error. Please try again.' });
+    }
+  }
+);
+
+// ---------- Reset password ----------
+router.post(
+  '/reset-password',
+  csrfCheck,
+  [
+    body('email').isEmail().withMessage('Valid email required.').normalizeEmail(),
+    body('code').trim().isLength({ min: 6, max: 6 }).withMessage('Enter the 6-digit code.'),
+    body('newPassword').isLength({ min: 8 }).withMessage('New password must be at least 8 characters.')
+  ],
+  async (req, res) => {
+    const errors = validationResult(req).array();
+    if (errors.length) return res.status(400).json({ error: errors[0].msg });
+
+    const { email, code, newPassword } = req.body;
+
+    try {
+      const user = await User.findOne({ email });
+      if (!user || !user.resetCode) {
+        return res.status(400).json({ error: 'Invalid or expired code.' });
+      }
+
+      if (user.resetCodeExpiresAt && user.resetCodeExpiresAt.getTime() < Date.now()) {
+        user.resetCode = null;
+        user.resetCodeExpiresAt = null;
+        await user.save();
+        return res.status(400).json({ error: 'Code expired. Request a new one.' });
+      }
+
+      if ((user.resetAttempts || 0) >= 5) {
+        return res.status(429).json({ error: 'Too many attempts. Request a new code.' });
+      }
+
+      if (user.resetCode !== code) {
+        user.resetAttempts = (user.resetAttempts || 0) + 1;
+        await user.save();
+        return res.status(400).json({ error: 'Wrong code.' });
+      }
+
+      // Correct code - reset password
+      await user.setPassword(newPassword);
+      user.resetCode = null;
+      user.resetCodeExpiresAt = null;
+      user.resetAttempts = 0;
+      await user.save();
+
+      await Activity.create({
+        user: user._id,
+        type: 'settings',
+        message: 'Password reset via email code'
+      });
+
+      res.json({ ok: true, message: 'Password reset. You can now sign in.' });
+    } catch (err) {
+      console.error('[auth/reset-password]', err);
+      res.status(500).json({ error: 'Server error. Please try again.' });
+    }
+  }
+);
 router.post('/logout', csrfCheck, async (req, res) => {
   const uid = req.session.userId;
 

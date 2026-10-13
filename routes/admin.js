@@ -1,4 +1,5 @@
 const express = require("express");
+const rateLimit = require("express-rate-limit");
 const { requireAdmin } = require("../middleware/admin");
 const csrfCheck = require("../middleware/csrf");
 const User = require("../models/User");
@@ -10,11 +11,20 @@ const Notification = require("../models/Notification");
 
 const router = express.Router();
 
-// ---------- Unlock endpoints (no auth required) ----------
-router.post("/unlock", (req, res) => {
-  const password = process.env.ADMIN_PANEL_PASSWORD || "DAMILOLA1";
+const unlockLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many attempts. Try again in 15 minutes." }
+});
+
+router.post("/unlock", unlockLimiter, (req, res) => {
+  const password = process.env.ADMIN_PANEL_PASSWORD;
+  if (!password) return res.status(500).json({ error: "Admin panel not configured" });
   if (req.body && req.body.password === password) {
     req.session.adminUnlocked = true;
+    req.session.adminExpiresAt = Date.now() + 60 * 60 * 1000;
     req.session.save(function () { res.json({ ok: true }); });
     return;
   }
@@ -22,15 +32,19 @@ router.post("/unlock", (req, res) => {
 });
 
 router.post("/lock", (req, res) => {
-  if (req.session) req.session.adminUnlocked = false;
+  if (req.session) {
+    req.session.adminUnlocked = false;
+    req.session.adminExpiresAt = null;
+  }
   req.session.save(function () { res.json({ ok: true }); });
 });
 
 router.get("/status", (req, res) => {
-  res.json({ unlocked: !!(req.session && req.session.adminUnlocked) });
+  var unlocked = req.session && req.session.adminUnlocked === true;
+  var notExpired = req.session && req.session.adminExpiresAt && Date.now() < req.session.adminExpiresAt;
+  res.json({ unlocked: !!(unlocked && notExpired) });
 });
 
-// ---------- Everything below requires admin ----------
 router.use(requireAdmin);
 
 router.get("/", async (req, res) => {
