@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin - Vaultra</title>
+  <title>Admin — Vaultra</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -24,21 +24,20 @@
 
 <header class="border-b border-white/5 bg-ink/60 backdrop-blur sticky top-0 z-30">
   <nav class="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-    <a href="/index.html" class="flex items-center gap-2">
+    <a href="/index.html" class="flex items-center gap-2 hover:scale-[1.02] transition-transform">
       <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-mint to-mint2 grid place-items-center shadow-glow">
         <i class="fa-solid fa-vault text-[#062015] text-sm"></i>
       </span>
       <span class="text-white font-semibold tracking-tight text-lg">Vaultra <span class="text-gold text-xs ml-1">ADMIN</span></span>
     </a>
     <div class="flex items-center gap-3">
-      <a href="/dashboard.html" class="text-sm text-slate-400 hover:text-white">Dashboard</a>
-      <button data-logout class="btn-ghost !py-2 !px-4 text-sm">Logout</button>
+      <a href="/dashboard.html" class="text-sm text-slate-400 hover:text-white min-h-[44px] flex items-center">Dashboard</a>
+      <button data-logout class="btn-ghost !py-2 !px-4 text-sm min-h-[44px]">Logout</button>
     </div>
   </nav>
 </header>
 
-<main id="adminRoot" class="max-w-7xl mx-auto px-5 sm:px-8 py-8">
-
+<main id="adminRoot" class="max-w-7xl mx-auto px-5 sm:px-8 py-8 page-enter">
   <div id="lockScreen" class="hidden grid place-items-center min-h-[60vh]">
     <div class="card max-w-md w-full">
       <div class="text-center mb-6">
@@ -54,7 +53,7 @@
           <label class="label" for="adminPassword">Password</label>
           <div class="relative">
             <input class="input pr-11" type="password" id="adminPassword" name="password"
-                   placeholder="Enter password" required autocomplete="off" />
+                    placeholder="Enter password" required autocomplete="off" />
             <button type="button" data-toggle-password="adminPassword"
                     class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
               <i class="fa-solid fa-eye"></i>
@@ -103,5 +102,68 @@
 <script src="/js/api.js"></script>
 <script src="/js/main.js"></script>
 <script src="/js/admin.js"></script>
+
+<!-- Plan edit modal -->
+<div id="planEditModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm grid place-items-center p-5">
+  <div class="card max-w-lg w-full">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-white font-semibold text-lg">Edit plan</h3>
+      <button type="button" id="closePlanEdit" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="planEditForm" class="space-y-4">
+      <input type="hidden" name="id" />
+      <div>
+        <label class="label">Plan name</label>
+        <input class="input" name="name" required />
+      </div>
+      <div>
+        <label class="label">Description</label>
+        <textarea class="input" name="description" rows="2"></textarea>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="label">APY %</label>
+          <input class="input" type="number" step="0.1" name="apyPercent" required />
+        </div>
+        <div>
+          <label class="label">Duration (days)</label>
+          <input class="input" type="number" name="durationDays" required />
+        </div>
+        <div>
+          <label class="label">Min ($)</label>
+          <input class="input" type="number" name="minAmount" required />
+        </div>
+        <div>
+          <label class="label">Max ($)</label>
+          <input class="input" type="number" name="maxAmount" required />
+        </div>
+        <div>
+          <label class="label">Fee %</label>
+          <input class="input" type="number" step="0.1" name="feePercent" />
+        </div>
+        <div>
+          <label class="label">Risk level</label>
+          <select class="input" name="riskLevel">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="label">Terms</label>
+        <textarea class="input" name="terms" rows="2"></textarea>
+      </div>
+      <label class="flex items-center gap-2">
+        <input type="checkbox" name="enabled" class="accent-mint w-4 h-4" />
+        <span class="text-sm text-slate-300">Enabled</span>
+      </label>
+      <button type="submit" class="btn-primary w-full min-h-[48px]">
+        <span data-label>Save plan</span>
+        <span data-spin class="hidden"><span class="spinner"></span></span>
+      </button>
+    </form>
+  </div>
+</div>
 </body>
 </html>

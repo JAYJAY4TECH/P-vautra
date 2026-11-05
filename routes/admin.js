@@ -8,6 +8,7 @@ const Activity = require("../models/Activity");
 const Referral = require("../models/Referral");
 const Vault = require("../models/Vault");
 const Notification = require("../models/Notification");
+const Withdrawal = require("../models/Withdrawal");
 
 const router = express.Router();
 
@@ -198,4 +199,211 @@ router.post("/plans/:id/toggle", csrfCheck, async (req, res) => {
   res.json({ plan: plan });
 });
 
+router.get("/withdrawals", csrfCheck, async (req, res) => {
+  try {
+    const list = await Withdrawal.find()
+      .populate("user", "fullName email")
+      .sort({ createdAt: -1 })
+      .limit(100);
+    res.json({ withdrawals: list });
+  } catch (err) {
+    console.error("[admin/withdrawals/list]", err);
+    res.status(500).json({ error: "Could not load withdrawals." });
+  }
+});
+
+router.post("/withdrawals/:id/approve", csrfCheck, async (req, res) => {
+  try {
+    const w = await Withdrawal.findById(req.params.id);
+    if (!w) return res.status(404).json({ error: "Withdrawal not found." });
+    if (w.status !== "pending") return res.status(400).json({ error: "Already reviewed." });
+
+    w.status = "approved";
+    w.reviewedAt = new Date();
+    w.reviewedBy = req.user ? req.user._id : null;
+    w.reviewNote = req.body.note || "Approved by admin";
+    await w.save();
+
+    await Notification.create({
+      user: w.user,
+      title: "Withdrawal approved",
+      body: "Your $" + w.amountUsd.toFixed(2) + " " + w.coin + " withdrawal was approved. Payout is on the way.",
+      kind: "success"
+    });
+
+    res.json({ ok: true, withdrawal: w.toClientJSON() });
+  } catch (err) {
+    console.error("[admin/withdrawals/approve]", err);
+    res.status(500).json({ error: "Could not approve." });
+  }
+});
+
+router.post("/withdrawals/:id/paid", csrfCheck, async (req, res) => {
+  try {
+    const w = await Withdrawal.findById(req.params.id);
+    if (!w) return res.status(404).json({ error: "Withdrawal not found." });
+    if (w.status !== "approved") return res.status(400).json({ error: "Must be approved first." });
+
+    w.status = "paid";
+    w.paidAt = new Date();
+    w.txHash = req.body.txHash || null;
+    await w.save();
+
+    const user = await User.findById(w.user);
+    if (user) {
+      user.withdrawnUsd = (user.withdrawnUsd || 0) + w.amountUsd;
+      user.balance = Math.max(0, (user.balance || 0) - w.amountUsd);
+      await user.save();
+    }
+
+    await Notification.create({
+      user: w.user,
+      title: "Withdrawal paid",
+      body: "Your $" + w.amountUsd.toFixed(2) + " " + w.coin + " withdrawal was sent.",
+      kind: "success"
+    });
+
+    res.json({ ok: true, withdrawal: w.toClientJSON() });
+  } catch (err) {
+    console.error("[admin/withdrawals/paid]", err);
+    res.status(500).json({ error: "Could not mark as paid." });
+  }
+});
+
+router.post("/withdrawals/:id/reject", csrfCheck, async (req, res) => {
+  try {
+    const w = await Withdrawal.findById(req.params.id);
+    if (!w) return res.status(404).json({ error: "Withdrawal not found." });
+    if (w.status !== "pending") return res.status(400).json({ error: "Already reviewed." });
+
+    w.status = "rejected";
+    w.reviewedAt = new Date();
+    w.reviewNote = req.body.note || "Rejected by admin";
+    await w.save();
+
+    await Notification.create({
+      user: w.user,
+      title: "Withdrawal rejected",
+      body: "Your $" + w.amountUsd.toFixed(2) + " withdrawal was rejected. Contact support.",
+      kind: "warning"
+    });
+
+    res.json({ ok: true, withdrawal: w.toClientJSON() });
+  } catch (err) {
+    console.error("[admin/withdrawals/reject]", err);
+    res.status(500).json({ error: "Could not reject." });
+  }
+});
+// ---------- Delete user ----------
+router.delete("/users/:id", csrfCheck, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: "User not found." });
+
+    if (user.role === "admin") {
+      return res.status(400).json({ error: "Cannot delete another admin." });
+    }
+
+    // Delete user's vaults, activities, notifications, referrals
+    await Vault.deleteMany({ user: user._id });
+    await Activity.deleteMany({ user: user._id });
+    await Notification.deleteMany({ user: user._id });
+    await Referral.deleteMany({ $or: [{ referrer: user._id }, { referee: user._id }] });
+
+    await User.findByIdAndDelete(user._id);
+
+    res.json({ ok: true, message: "User deleted." });
+  } catch (err) {
+    console.error("[admin/users/delete]", err);
+    res.status(500).json({ error: "Could not delete user." });
+  }
+});
+
+// ---------- Update plan ----------
+router.put("/plans/:id", csrfCheck, async (req, res) => {
+  try {
+    const plan = await Plan.findById(req.params.id);
+    if (!plan) return res.status(404).json({ error: "Plan not found." });
+
+    const {
+      name, description, minAmount, maxAmount,
+      durationDays, apyPercent, feePercent, riskLevel, terms, enabled
+    } = req.body;
+
+    if (name) plan.name = name;
+    if (description !== undefined) plan.description = description;
+    if (minAmount !== undefined) plan.minAmount = Number(minAmount);
+    if (maxAmount !== undefined) plan.maxAmount = Number(maxAmount);
+    if (durationDays !== undefined) plan.durationDays = Number(durationDays);
+    if (apyPercent !== undefined) plan.apyPercent = Number(apyPercent);
+    if (feePercent !== undefined) plan.feePercent = Number(feePercent);
+    if (riskLevel) plan.riskLevel = riskLevel;
+    if (terms !== undefined) plan.terms = terms;
+    if (enabled !== undefined) plan.enabled = !!enabled;
+
+    await plan.save();
+    res.json({ ok: true, plan });
+  } catch (err) {
+    console.error("[admin/plans/update]", err);
+    res.status(500).json({ error: "Could not update plan." });
+  }
+});
+
+// ---------- Update deposit amount (credit user with actual amount) ----------
+router.post("/deposits/:id/set-amount", csrfCheck, async (req, res) => {
+  try {
+    const activity = await Activity.findById(req.params.id);
+    if (!activity) return res.status(404).json({ error: "Deposit not found." });
+    if (activity.status !== "pending") return res.status(400).json({ error: "Already reviewed." });
+
+    const actualAmount = Number(req.body.actualAmount);
+    if (!actualAmount || actualAmount <= 0) {
+      return res.status(400).json({ error: "Enter a valid amount." });
+    }
+
+    const user = await User.findById(activity.user);
+    if (!user) return res.status(404).json({ error: "User not found." });
+
+    user.balance = (user.balance || 0) + actualAmount;
+    user.totalDepositedUsd = (user.totalDepositedUsd || 0) + actualAmount;
+    user.lastApprovedDepositAt = new Date();
+    await user.save();
+
+    if (activity.vaultId) {
+      const vault = await Vault.findById(activity.vaultId);
+      if (vault && vault.status === "active") {
+        vault.principalUsd = (vault.principalUsd || 0) + actualAmount;
+        await vault.save();
+      }
+    }
+
+    activity.status = "completed";
+    activity.amountUsd = actualAmount;
+    activity.reviewedAt = new Date();
+    activity.reviewNote = req.body.note || "Amount set by admin";
+    activity.message = "Deposit of $" + actualAmount.toFixed(2) + " confirmed";
+    await activity.save();
+
+    await Activity.create({
+      user: user._id,
+      type: "admin_credit",
+      message: "Admin credited $" + actualAmount.toFixed(2),
+      amountUsd: actualAmount,
+      status: "completed",
+      reviewedAt: new Date()
+    });
+
+    await Notification.create({
+      user: user._id,
+      title: "Deposit confirmed",
+      body: "Your deposit of $" + actualAmount.toFixed(2) + " has been credited to your balance.",
+      kind: "success"
+    });
+
+    res.json({ ok: true, message: "Deposit confirmed: $" + actualAmount.toFixed(2) });
+  } catch (err) {
+    console.error("[admin/deposits/set-amount]", err);
+    res.status(500).json({ error: "Could not update deposit." });
+  }
+});
 module.exports = router;

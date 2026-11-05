@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema({
   status: { type: String, enum: ["active", "suspended"], default: "active" },
   lastLoginAt: Date,
 
+  // Deposit / withdrawal tracking
+  lastApprovedDepositAt: { type: Date, default: null },
+  totalDepositedUsd: { type: Number, default: 0 },
+  withdrawnUsd: { type: Number, default: 0 },
+
   // Password reset
   resetCode: { type: String, default: null },
   resetCodeExpiresAt: { type: Date, default: null },
