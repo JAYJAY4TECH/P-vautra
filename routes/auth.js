@@ -9,18 +9,18 @@ const csrfCheck = require('../middleware/csrf');
 
 const router = express.Router();
 
-// ---------- CSRF token endpoint ----------
+
 router.get('/csrf', (req, res) => {
   res.json({ csrfToken: res.locals.csrfToken });
 });
 
-// ---------- Current user ----------
+
 router.get('/me', (req, res) => {
   if (!req.user) return res.status(401).json({ user: null });
   res.json({ user: req.user.toSafeJSON() });
 });
 
-// ---------- Register ----------
+
 router.post(
   '/register',
   requireGuest,
@@ -72,7 +72,7 @@ router.post(
 
       await Activity.create({ user: user._id, type: 'signup', message: 'Account created' });
 
-      // ---------- Session setup ----------
+       
       req.session.userId = user._id.toString();
       applyRememberMe(req, remember);
 
@@ -90,7 +90,7 @@ router.post(
   }
 );
 
-// ---------- Login ----------
+
 router.post(
   '/login',
   csrfCheck,
