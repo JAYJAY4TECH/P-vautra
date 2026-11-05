@@ -59,10 +59,10 @@
   // Hide skeletons and show real data with countUp
   function hideStatSkeletons(data) {
     const balanceEl = document.querySelector('[data-stat="balance"]');
-    if (balanceEl) window.countUp(balanceEl, Number(data.user.balance) || 0);
+    if (balanceEl) window.countUp(balanceEl, Number(data.user.balance) || 0, '$');
     document.querySelectorAll('[data-stat="referrals"]').forEach(el => el.textContent = data.referralCount || 0);
     const rewardsEl = document.querySelector('[data-stat="rewards"]');
-    if (rewardsEl) window.countUp(rewardsEl, Number(data.referralRewards) || 0);
+    if (rewardsEl) window.countUp(rewardsEl, Number(data.referralRewards) || 0, '$');
     document.querySelectorAll('[data-stat="plan"]').forEach(el => el.textContent = (data.user.activePlan && data.user.activePlan.name) || 'None');
   }
 
