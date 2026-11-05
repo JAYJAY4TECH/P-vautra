@@ -1,4 +1,4 @@
-// Vaultra dashboard page — overview, activity, notifications, profile, settings, deposit/withdraw
+// Vaultra dashboard page - overview, activity, notifications, profile, settings, deposit/withdraw
 (function () {
   const path = window.location.pathname;
   const isDashboardPage =
@@ -12,9 +12,12 @@
 
   // ---------- Utilities ----------
   function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return { '&': '&', '<': '<', '>': '>', '"': '"', "'": ''' }[c];
-    });
+    return String(s == null ? '' : s)
+      .split('&').join('&amp;')
+      .split('<').join('&lt;')
+      .split('>').join('&gt;')
+      .split('"').join('&quot;')
+      .split("'").join('&#39;');
   }
 
   function fmtMoney(n) {
@@ -164,7 +167,7 @@
         form.email.disabled = true;
       }
       const codeEl = document.getElementById('refCode');
-      if (codeEl) codeEl.textContent = data.user.referralCode || '—';
+      if (codeEl) codeEl.textContent = data.user.referralCode || 'Ã¢â‚¬â€';
     } catch (err) {
       if (err.status === 401) return redirectToLogin();
     }
